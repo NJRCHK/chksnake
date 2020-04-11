@@ -139,7 +139,7 @@ def floodFill(pos, data, dataArray):
 	return count
 
 
-def arrayify(nextMove, data, is_ghost_head):
+def arrayify(nextMove, data, ghost_head_enabled):
 	"""
 	returns state of board as a 2d array. used for floodFill
 	"""
@@ -153,7 +153,7 @@ def arrayify(nextMove, data, is_ghost_head):
 	for x in snake_bodies:
 		a[x['y']][x['x']] = 1
 		for snake in snakes:
-			if snake["id"] != data["you"]["id"] and is_ghost_head:
+			if (snake["id"] != data["you"]["id"]) and ghost_head_enabled and (len(snake["body"]) >= len(data["you"]["body"])):
 				try:
 					a[snake["body"][0]["y"]+1][snake["body"][0]["x"]] = 1
 				except IndexError:
