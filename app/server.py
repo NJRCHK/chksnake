@@ -203,7 +203,7 @@ def goto(moveC, pos, data):
 	"""
 	myHeadX = data["you"]["body"][0]["x"]
 	myHeadY = data["you"]["body"][0]["y"]
-
+	body_length = len(data["you"]["body"])
 	directionX = pos["x"] - myHeadX
 	directionY = myHeadY - pos["y"]
 	print("directionX : " + str(directionX) + "directiony: " + str(directionY))
@@ -211,6 +211,7 @@ def goto(moveC, pos, data):
 	moveY = ""
 	moveXfill = 0
 	moveYfill = 0
+	
 	if directionX > 0:
 		moveX = "right"
 		moveXfill = moveC[2]
@@ -223,15 +224,23 @@ def goto(moveC, pos, data):
 	elif directionY < 0:
 		moveY = "down"
 		moveYfill = moveC[1]
+	
+	print("movexfill: " + str(moveXfill) + " moveyfill: " + str(moveYfill))
+	
 	if moveXfill == 0 and moveYfill == 0:
 		return ""
-	elif moveXfill > moveYfill and moveXfill > 10:
+			return moveX
+		return moveY
+	elif (moveXfill >= body_length):
 		return moveX
-	elif moveYfill > moveXfill and moveYfill > 10:
+	elif (moveYfill >= body_length):
 		return moveY
 	else:
 		print("returned nothing. movexfill = " + str(moveXfill) + " and moveYfill = " + str(moveYfill))
 		return ""
+	#if both have room, return largest
+	#else return one with room
+	#else return one with largest room
 
 
 def main():
