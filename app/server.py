@@ -229,6 +229,8 @@ def goto(moveC, pos, data):
 	
 	if moveXfill == 0 and moveYfill == 0:
 		return ""
+	if (moveXfill >= body_length) and (moveYfill >= body_length):
+		if moveXfill > moveYfill:
 			return moveX
 		return moveY
 	elif (moveXfill >= body_length):
