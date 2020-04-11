@@ -179,9 +179,9 @@ def largestSnake(data):
 	"""
 	myLength = len(data["you"]["body"])
 	for i in data["board"]["snakes"]:
-		if i["id"] != data["you"]["id"] and myLength > len(i["body"]):
-			return True
-	return False
+		if i["id"] != data["you"]["id"] and myLength <= len(i["body"]):
+			return False
+	return True
 
 def findFood(data):
 	x = data["you"]["body"][0]["x"]
