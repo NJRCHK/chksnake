@@ -44,6 +44,8 @@ def move():
 	#print("MOVE:", json.dumps(data))
 	# THE BEST MOVE IS CALUCLATED USING A FLOODFILL. HIGHEST AREA WIN. ME SPEEL GOOD
 	move = ""
+	print("GameID: " + str(data["game"]["id"]))
+	print("Turn: " + str(data["turn"]))
 
 	upC = floodFill(getNextPosition("up", data), data, arrayify("up", data, not largestSnake(data)))
 	downC = floodFill(getNextPosition("down", data), data, arrayify("down", data, not largestSnake(data)))
@@ -53,7 +55,7 @@ def move():
 	#if moveC cannot find a viable move with ghostheads, it disables them so the snake doesn't kill itself
 
 	move = goto(moveC, findFood(data), data)
-	print("moveC before max = " + str(moveC))
+	print("floodFill before disabling ghostheads: = " + str(moveC))
 	if max(moveC) == 0:
 		print("ghosthead disabled")
 		upC = floodFill(getNextPosition("up", data), data, arrayify("up", data, False))
@@ -61,9 +63,8 @@ def move():
 		rightC = floodFill(getNextPosition("right", data), data, arrayify("right", data, False))
 		leftC = floodFill(getNextPosition("left", data),  data, arrayify("left", data, False))
 		moveC = [upC, downC, rightC, leftC]
+		print("floodFill after disabling ghostheads: " + str(moveC))
 
-	print("move after goto: " + move)
-	print("movC after if max 0 block: " + str(moveC))
 	if move == "":
 		goodMoves = []
 		if upC == max(moveC):
@@ -206,7 +207,6 @@ def goto(moveC, pos, data):
 
 	directionX = pos["x"] - myHeadX
 	directionY = myHeadY - pos["y"]
-	print("directionX : " + str(directionX) + "directiony: " + str(directionY))
 	moveX = ""
 	moveY = ""
 	moveXfill = 0
