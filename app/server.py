@@ -148,7 +148,7 @@ def arrayify(nextMove, data, ghost_head_enabled):
 	a = [[0] * m for i in range(n)]
 
 	snakes = data["board"]["snakes"]
-	snake_bodies = [body for snake in snakes for body in snake['body']]
+	snake_bodies = [body for snake in snakes for body in snake['body'][:-1]]
 
 	for x in snake_bodies:
 		a[x['y']][x['x']] = 1
