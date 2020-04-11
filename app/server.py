@@ -189,7 +189,7 @@ def findFood(data):
 	food = data["board"]["food"]
 	lowestIndex = 0
 
-	for i in range(len(food)-1):
+	for i in range(len(food)):
 		if abs(food[i]["x"]-x)+abs(food[i]["y"]-y) < abs(food[lowestIndex]["x"]-x)+abs(food[lowestIndex]["y"]-y):
 			lowestIndex = i
 
