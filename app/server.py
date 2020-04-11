@@ -39,7 +39,7 @@ def move():
 	The data parameter will contain information about the board.
 	Your response must include your move of up, down, left, or right.
 	"""
-	directions = ["up", "down", "left", "right"]
+
 	data = bottle.request.json
 	#print("MOVE:", json.dumps(data))
 	# THE BEST MOVE IS CALUCLATED USING A FLOODFILL. HIGHEST AREA WIN. ME SPEEL GOOD
@@ -139,7 +139,7 @@ def floodFill(pos, data, dataArray, level):
 	return count
 
 
-def arrayify(nextMove, data, ghostHead):
+def arrayify(nextMove, data, is_ghost_head):
 	"""
 	returns state of board as a 2d array. used for floodFill
 	"""
@@ -147,34 +147,29 @@ def arrayify(nextMove, data, ghostHead):
 	m = data["board"]["width"]
 	a = [[0] * m for i in range(n)]
 
-	nextPos = getNextPosition(nextMove,data)
-
 	snakes = data["board"]["snakes"]
-	bodys = []
-	for snake in snakes:
-		for body in snake['body']:
-			bodys.append(body)
+	snake_bodies = [body for snake in snakes for body in snake['body']]
 
-	for x in bodys:
+	for x in snake_bodies:
 		a[x['y']][x['x']] = 1
 		for snake in snakes:
-			if snake["id"] != data["you"]["id"] and ghostHead == True:
+			if snake["id"] != data["you"]["id"] and is_ghost_head:
 				try:
 					a[snake["body"][0]["y"]+1][snake["body"][0]["x"]] = 1
 				except IndexError:
-					ignore = "this"
+					pass
 				try:
 					a[snake["body"][0]["y"]-1][snake["body"][0]["x"]] = 1
 				except IndexError:
-					ignore = "this"
+					pass
 				try:
 					a[snake["body"][0]["y"]][snake["body"][0]["x"]+1] = 1
 				except IndexError:
-					ignore = "this"
+					pass
 				try:
 					a[snake["body"][0]["y"]][snake["body"][0]["x"]-1] = 1
 				except IndexError:
-					ignore = "this"
+					pass
 	return a
 
 def largestSnake(data):
