@@ -55,7 +55,7 @@ def move():
 	if food_to_get != "":
 		move = goto(moveC, food_to_get, data)
 
-	if isStuck(moveC, data) or food_to_get == "":
+	if isStuck(moveC, data):
 		if upC == max(moveC):
 			move = "up"
 		elif downC == max(moveC):
