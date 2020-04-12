@@ -41,11 +41,10 @@ def move():
 	"""
 
 	data = bottle.request.json
-	#print("MOVE:", json.dumps(data))
 	# THE BEST MOVE IS CALUCLATED USING A FLOODFILL. HIGHEST AREA WIN. ME SPEEL GOOD
 	move = ""
-	print("GameID: " + str(data["game"]["id"]))
-	print("Turn: " + str(data["turn"]))
+	print(str(data))
+
 
 	upC = floodFill(getNextPosition("up", data), data, arrayify("up", data, not largestSnake(data)))
 	downC = floodFill(getNextPosition("down", data), data, arrayify("down", data, not largestSnake(data)))
@@ -57,7 +56,6 @@ def move():
 	move = goto(moveC, findFood(data), data)
 
 	if isStuck(moveC, data):
-		print("isStuck enabled")
 		if upC == max(moveC):
 			move = "up"
 		elif downC == max(moveC):
@@ -66,17 +64,13 @@ def move():
 			move = "left"
 		elif rightC == max(moveC):
 			move = "right"
-		print("move after isStuck")
 
-	print("floodFill before disabling ghostheads: = " + str(moveC))
 	if max(moveC) == 0:
-		print("ghosthead disabled")
 		upC = floodFill(getNextPosition("up", data), data, arrayify("up", data, False))
 		downC = floodFill(getNextPosition("down", data), data, arrayify("down", data, False))
 		rightC = floodFill(getNextPosition("right", data), data, arrayify("right", data, False))
 		leftC = floodFill(getNextPosition("left", data),  data, arrayify("left", data, False))
 		moveC = [upC, downC, rightC, leftC]
-		print("floodFill after disabling ghostheads: " + str(moveC))
 
 
 	if move == "":
@@ -90,9 +84,6 @@ def move():
 		if rightC == max(moveC):
 			goodMoves.append("right")
 		move = random.choice(goodMoves)
-
-	print("Turn: " + str(data["turn"]))
-	print("Move: " + move)
 
 	response = {"move": move, "shout": "yeet"}
 	return HTTPResponse(
@@ -108,7 +99,6 @@ def end():
 	Called every time a game with your snake in it ends.
 	"""
 	data = bottle.request.json
-	#print("END:", json.dumps(data))
 	return HTTPResponse(status=200)
 
 def isStuck(moveC, data):
@@ -214,7 +204,6 @@ def findFood(data):
 			lowestIndex = i
 
 	pos = {"x": food[lowestIndex]["x"], "y": food[lowestIndex]["y"]}
-	print("Position of nearest food: " + str(pos))
 	return pos
 
 def goto(moveC, pos, data):
@@ -244,7 +233,6 @@ def goto(moveC, pos, data):
 		moveY = "down"
 		moveYfill = moveC[1]
 
-	print("movexfill: " + str(moveXfill) + " moveyfill: " + str(moveYfill))
 
 	if moveXfill == 0 and moveYfill == 0:
 		return ""
@@ -257,7 +245,6 @@ def goto(moveC, pos, data):
 	elif (moveYfill >= body_length):
 		return moveY
 	else:
-		print("returned nothing. movexfill = " + str(moveXfill) + " and moveYfill = " + str(moveYfill))
 		return ""
 	#if both have room, return largest
 	#else return one with room
