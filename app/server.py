@@ -4,7 +4,6 @@ import random
 import bottle
 from bottle import HTTPResponse
 
-
 @bottle.route("/")
 def index():
 	return "Your Battlesnake is alive!"
@@ -52,8 +51,9 @@ def move():
 	leftC = floodFill(getNextPosition("left", data),  data, arrayify("left", data, not largestSnake(data)))
 	moveC = [upC, downC, rightC, leftC]
 	#if moveC cannot find a viable move with ghostheads, it disables them so the snake doesn't kill itself
-
-	move = goto(moveC, findFood(data), data)
+	food_to_get = findFood(data)
+	if food_to_get != "":
+		move = goto(moveC, food_to_get, data)
 
 	if isStuck(moveC, data):
 		if upC == max(moveC):
@@ -194,13 +194,44 @@ def largestSnake(data):
 	return True
 
 def findFood(data):
-	x = data["you"]["body"][0]["x"]
-	y = data["you"]["body"][0]["y"]
+	"""
+	finds the best food for you to go for
+	"""
+	your_ID = data["you"]["id"]
 	food = data["board"]["food"]
 	lowestIndex = 0
+	potential_fruits = data["board"]["food"]
+	closest_snake = ""
+	smallest_distance = 1337
+	"""
+	finds which fruits you are closest to compared to other snakes
+	"""
+	for i in food:
+		for j in data["board"]["snakes"]:
+			distance = abs(j["body"][0]["x"] - i["x"]) +  abs(j["body"][0]["y"] - i["y"])
+			if distance < smallest_distance:
+				smallest_distance = distance
+				closest_snake = j["id"]
+			elif distance == smallest_distance and not largestSnake(data) and your_ID != j["id"]:
+				smallest_distance = distance
+				closest_snake = j["id"]
+		if closest_snake == your_ID:
+			potential_fruits.append(i)
 
-	for i in range(len(food)):
-		if abs(food[i]["x"]-x)+abs(food[i]["y"]-y) < abs(food[lowestIndex]["x"]-x)+abs(food[lowestIndex]["y"]-y):
+	"""
+	returns 0 if there are no acceptable fruit to move to
+	"""
+	if len(potential_fruits) == 0:
+		return ""
+	"""
+	out of food you are the closest snake to, which one is the closest
+	"""
+	x = data["you"]["body"][0]["x"]
+	y = data["you"]["body"][0]["y"]
+	lowest_index = 0
+
+	for i in range(len(potential_fruits)):
+		if abs(potential_fruits[i]["x"]-x)+abs(food[i]["y"]-y) < abs(food[lowestIndex]["y"]-y):
 			lowestIndex = i
 
 	pos = {"x": food[lowestIndex]["x"], "y": food[lowestIndex]["y"]}
