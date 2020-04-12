@@ -55,6 +55,19 @@ def move():
 	#if moveC cannot find a viable move with ghostheads, it disables them so the snake doesn't kill itself
 
 	move = goto(moveC, findFood(data), data)
+
+	if isStuck(moveC, data):
+		print("isStuck enabled")
+		if upC == max(moveC):
+			move = "up"
+		elif downC == max(moveC):
+			move = "down"
+		elif leftC == max(moveC):
+			move = "left"
+		elif rightC == max(moveC):
+			move = "right"
+		print("move after isStuck")
+
 	print("floodFill before disabling ghostheads: = " + str(moveC))
 	if max(moveC) == 0:
 		print("ghosthead disabled")
@@ -64,6 +77,7 @@ def move():
 		leftC = floodFill(getNextPosition("left", data),  data, arrayify("left", data, False))
 		moveC = [upC, downC, rightC, leftC]
 		print("floodFill after disabling ghostheads: " + str(moveC))
+
 
 	if move == "":
 		goodMoves = []
@@ -97,6 +111,11 @@ def end():
 	#print("END:", json.dumps(data))
 	return HTTPResponse(status=200)
 
+def isStuck(moveC, data):
+	body_length = len(data["you"]["body"])
+	if max(moveC) < body_length:
+		return True
+	return False
 
 
 def getNextPosition(move, data):
@@ -211,7 +230,7 @@ def goto(moveC, pos, data):
 	moveY = ""
 	moveXfill = 0
 	moveYfill = 0
-	
+
 	if directionX > 0:
 		moveX = "right"
 		moveXfill = moveC[2]
@@ -224,9 +243,9 @@ def goto(moveC, pos, data):
 	elif directionY < 0:
 		moveY = "down"
 		moveYfill = moveC[1]
-	
+
 	print("movexfill: " + str(moveXfill) + " moveyfill: " + str(moveYfill))
-	
+
 	if moveXfill == 0 and moveYfill == 0:
 		return ""
 	if (moveXfill >= body_length) and (moveYfill >= body_length):
