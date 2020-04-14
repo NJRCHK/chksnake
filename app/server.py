@@ -100,7 +100,10 @@ def end():
 	Called every time a game with your snake in it ends.
 	"""
 	data = bottle.request.json
-	print(data["game"]["id"] + " END")
+	print("END")
+	print(data["game"]["id"])
+	print(str(data))
+	print("END")
 	return HTTPResponse(status=200)
 
 def isStuck(moveC, data):
