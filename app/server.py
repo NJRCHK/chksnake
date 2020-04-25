@@ -46,7 +46,6 @@ def move():
 	move = ""
 	print(str(data))
 
-
 	upC = floodFill(getNextPosition("up", data), data, arrayify("up", data, not largestSnake(data)))
 	downC = floodFill(getNextPosition("down", data), data, arrayify("down", data, not largestSnake(data)))
 	rightC = floodFill(getNextPosition("right", data), data, arrayify("right", data, not largestSnake(data)))
@@ -56,7 +55,7 @@ def move():
 
 	move = goto(moveC, findFood(data), data)
 
-	if isStuck(moveC, data):
+	if isStuck(moveC, data) and max(moveC) != 0:
 		if upC == max(moveC):
 			move = "up"
 		elif downC == max(moveC):
