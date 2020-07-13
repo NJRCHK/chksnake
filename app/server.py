@@ -44,7 +44,6 @@ def move():
 	data = bottle.request.json
 	# THE BEST MOVE IS CALUCLATED USING A FLOODFILL. HIGHEST AREA WIN. ME SPEEL GOOD
 	move = ""
-	print(str(data))
 
 	upC = floodFill(getNextPosition("up", data), data, arrayify("up", data, not largestSnake(data)))
 	downC = floodFill(getNextPosition("down", data), data, arrayify("down", data, not largestSnake(data)))
@@ -99,10 +98,6 @@ def end():
 	Called every time a game with your snake in it ends.
 	"""
 	data = bottle.request.json
-	print("END")
-	print(data["game"]["id"])
-	print(str(data))
-	print("END")
 	return HTTPResponse(status=200)
 
 def isStuck(moveC, data):
