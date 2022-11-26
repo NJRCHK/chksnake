@@ -32,42 +32,45 @@ def move(game_state):
 
     data = game_state
     move = ""
-    upC = floodFill(getNextPosition("up", data), data, arrayify(data, not largestSnake(data)))
-    downC = floodFill(getNextPosition("down", data), data, arrayify(data, not largestSnake(data)))
-    rightC = floodFill(getNextPosition("right", data), data, arrayify(data, not largestSnake(data)))
-    leftC = floodFill(getNextPosition("left", data),  data, arrayify(data, not largestSnake(data)))
-    moveC = [upC, downC, rightC, leftC]
+    up_area = floodFill(getNextPosition("up", data), data, arrayify(data, not largestSnake(data)))
+    down_area = floodFill(getNextPosition("down", data), data, arrayify(data, not largestSnake(data)))
+    right_area = floodFill(getNextPosition("right", data), data, arrayify(data, not largestSnake(data)))
+    left_area = floodFill(getNextPosition("left", data),  data, arrayify(data, not largestSnake(data)))
+    move_area = [up_area, down_area, right_area, left_area]
 
-    move = goto(moveC, findFood(data), data)
+    if len(data["board"]["food"]) > 0:
+        print("My Current position: {}".format(data["you"]["head"]))
+        print("Closest Food: {}".format(findFood(data)))
+        move = goto(move_area, findFood(data), data)
 
-    if is_stuck(moveC, data) and max(moveC) != 0:
-        if upC == max(moveC):
+    if is_stuck(move_area, data) and max(move_area) != 0:
+        if up_area == max(move_area):
             move = "up"
-        elif downC == max(moveC):
+        elif down_area == max(move_area):
             move = "down"
-        elif leftC == max(moveC):
+        elif left_area == max(move_area):
             move = "left"
-        elif rightC == max(moveC):
+        elif right_area == max(move_area):
             move = "right"
 
-    if max(moveC) == 0:
+    if max(move_area) == 0:
         print("disabling ghostheads no good moves detected")
-        upC = floodFill(getNextPosition("up", data), data, arrayify(data, False))
-        downC = floodFill(getNextPosition("down", data), data, arrayify(data, False))
-        rightC = floodFill(getNextPosition("right", data), data, arrayify(data, False))
-        leftC = floodFill(getNextPosition("left", data),  data, arrayify(data, False))
-        moveC = [upC, downC, rightC, leftC]
+        up_area = floodFill(getNextPosition("up", data), data, arrayify(data, False))
+        down_area = floodFill(getNextPosition("down", data), data, arrayify(data, False))
+        right_area = floodFill(getNextPosition("right", data), data, arrayify(data, False))
+        left_area = floodFill(getNextPosition("left", data),  data, arrayify(data, False))
+        move_area = [up_area, down_area, right_area, left_area]
 
-    print(upC, downC, rightC, leftC)
+    print(up_area, down_area, right_area, left_area)
     if move == "":
         goodMoves = []
-        if upC == max(moveC):
+        if up_area == max(move_area):
             goodMoves.append("up")
-        if downC == max(moveC):
+        if down_area == max(move_area):
             goodMoves.append("down")
-        if leftC == max(moveC):
+        if left_area == max(move_area):
             goodMoves.append("left")
-        if rightC == max(moveC):
+        if right_area == max(move_area):
             goodMoves.append("right")
         move = random.choice(goodMoves)
     print(move)
@@ -81,9 +84,9 @@ def end(game_state):
     print("GAME OVER")
     
 
-def is_stuck(moveC, data):
+def is_stuck(move_area, data):
     body_length = len(data["you"]["body"])
-    if max(moveC) < body_length:
+    if max(move_area) < body_length:
         return True
     return False
 
@@ -92,8 +95,8 @@ def getNextPosition(move, data):
     """
     returns next position depending on which inputted
     """
-    nextPos = {"x": data["you"]["body"][0]['x'],
-                "y": data["you"]["body"][0]['y']}
+    nextPos = {"x": data["you"]["head"]['x'],
+                "y": data["you"]["head"]['y']}
 
     if move == 'up':
         nextPos["y"] = nextPos["y"] + 1
@@ -154,9 +157,10 @@ def arrayify(data, ghost_heads: bool):
     for snake in snakes:
         for body_part in snake["body"]:
             array[body_part["x"]][body_part["y"]] = 1
-
     if ghost_heads:
         for snake in snakes:
+            if snake["id"] == data["you"]["id"]:
+                continue
             head_x = snake["head"]["x"]
             head_y = snake["head"]["y"]
             if is_cords_in_board(head_x-1, head_y, height, width):
@@ -167,7 +171,6 @@ def arrayify(data, ghost_heads: bool):
                 array[head_x][head_y-1] = 1
             if is_cords_in_board(head_x, head_y+1, height, width):
                 array[head_x][head_y+1] = 1
-
     return array
 
 def largestSnake(data):
@@ -182,24 +185,23 @@ def largestSnake(data):
     return True
 
 def findFood(data):
-    x = data["you"]["body"][0]["x"]
-    y = data["you"]["body"][0]["y"]
+    x = data["you"]["head"]["x"]
+    y = data["you"]["head"]["y"]
     food = data["board"]["food"]
-    lowestIndex = 0
+    closest_food = data["board"]["food"][0]
+    for food in data["board"]["food"]:
+        distance_x = abs(x - food["x"])
+        distance_y = abs(y - food["y"])
+        delta_distance = distance_x + distance_y
+        current_closest_distance = abs(x - closest_food["x"]) + abs(y - closest_food["y"])
+        if delta_distance < current_closest_distance:
+            closest_food = food
+    return closest_food
 
-    for i in range(len(food)):
-        if abs(food[i]["x"]-x)+abs(food[i]["y"]-y) < abs(food[lowestIndex]["x"]-x)+abs(food[lowestIndex]["y"]-y):
-            lowestIndex = i
-
-    pos = {"x": food[lowestIndex]["x"], "y": food[lowestIndex]["y"]}
-    return pos
-
-def goto(moveC, pos, data):
+def goto(move_area, pos, data):
     """
     sends snake to position inputted
     """
-    myHeadX = data["you"]["head"]["x"]
-    myHeadY = data["you"]["head"]["y"]
     body_length = len(data["you"]["body"])
 
     my_head_x = data["you"]["head"]["x"]
@@ -211,20 +213,19 @@ def goto(moveC, pos, data):
     move_x = ""
     move_x_area = 0
     if distance_x > 0:
-        move_x = "right"
-        move_x_area = moveC[2]
-    elif distance_x < 0:
         move_x = "left"
-        move_x_area = moveC[3]
-    
+        move_x_area = move_area[3]
+    elif distance_x < 0:
+        move_x = "right"
+        move_x_area = move_area[2]
     move_y = ""
     move_y_area = 0
     if distance_y > 0:
         move_y = "down"
-        move_y_area = moveC[1]
+        move_y_area = move_area[1]
     elif distance_y < 0:
         move_y = "up"   
-        move_y_area = moveC[0] 
+        move_y_area = move_area[0] 
 
     if move_x_area < body_length:
         move_x_area = 0
@@ -232,7 +233,8 @@ def goto(moveC, pos, data):
     if move_y_area < body_length:
         move_y_area = 0
         move_y = ""
-
+    print("MOVE X: {}".format(move_x))
+    print("MOVE Y: {}".format(move_y)) 
     # if there are no valid moves, return "".  if one of the moves is invalid, return the other.  if both are valid choose move with most area
     if move_y == "" and move_x == "":
         return ""
