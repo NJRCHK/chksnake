@@ -198,45 +198,54 @@ def goto(moveC, pos, data):
     """
     sends snake to position inputted
     """
-    myHeadX = data["you"]["body"][0]["x"]
-    myHeadY = data["you"]["body"][0]["y"]
+    myHeadX = data["you"]["head"]["x"]
+    myHeadY = data["you"]["head"]["y"]
     body_length = len(data["you"]["body"])
-    directionX = pos["x"] - myHeadX
-    directionY = myHeadY - pos["y"]
-    moveX = ""
-    moveY = ""
-    moveXfill = 0
-    moveYfill = 0
 
-    if directionX > 0:
-        moveX = "right"
-        moveXfill = moveC[2]
-    elif directionX < 0:
-        moveX = "left"
-        moveXfill = moveC[3]
-    if directionY > 0:
-        moveY = "up"
-        moveYfill = moveC[0]
-    elif directionY < 0:
-        moveY = "down"
-        moveYfill = moveC[1]
+    my_head_x = data["you"]["head"]["x"]
+    my_head_y = data["you"]["head"]["y"] 
 
+    distance_x = my_head_x - pos["x"]
+    distance_y = my_head_y - pos["y"]
 
-    if moveXfill == 0 and moveYfill == 0:
+    move_x = ""
+    move_x_area = 0
+    if distance_x > 0:
+        move_x = "right"
+        move_x_area = moveC[2]
+    elif distance_x < 0:
+        move_x = "left"
+        move_x_area = moveC[3]
+    
+    move_y = ""
+    move_y_area = 0
+    if distance_y > 0:
+        move_y = "down"
+        move_y_area = moveC[1]
+    elif distance_y < 0:
+        move_y = "up"   
+        move_y_area = moveC[0] 
+
+    if move_x_area < body_length:
+        move_x_area = 0
+        move_x = ""
+    if move_y_area < body_length:
+        move_y_area = 0
+        move_y = ""
+
+    # if there are no valid moves, return "".  if one of the moves is invalid, return the other.  if both are valid choose move with most area
+    if move_y == "" and move_x == "":
         return ""
-    if (moveXfill >= body_length) and (moveYfill >= body_length):
-        if moveXfill > moveYfill:
-            return moveX
-        return moveY
-    elif (moveXfill >= body_length):
-        return moveX
-    elif (moveYfill >= body_length):
-        return moveY
+    elif move_y == "":
+        return move_x
+    elif move_x == "":
+        return move_y
+    elif move_x_area > move_y_area:
+        return move_x
+    elif move_y_area > move_x_area:
+        return move_y
     else:
-        return ""
-    #if both have room, return largest
-    #else return one with room
-    #else return one with largest room
+        return random.choice([move_x, move_y]) 
 
 if __name__ == "__main__":
     from server import run_server
